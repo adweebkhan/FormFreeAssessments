@@ -1,0 +1,35 @@
+SQL Queries
+
+1)
+SELECT * FROM [Customers]
+
+2)
+select c.name
+from Customers c
+join (  select customer_id
+        from Orders
+        group by customer_id
+        having count(distinct id) = (select count(*) from Orders)
+        ) d on c.id = d.customer_id
+
+3)
+select * from Customers where Customers.id not in (select customer_id from Orders)
+
+4)
+The first rule of thumb is choosing an index that lets you match as many queries as
+possible. Another important rule is to look at columns that are commonly used in
+WHERE and JOIN conditions because these conditions are responsible for filtering out
+a lot of the rows. For the 'Customers' table I think it would make a lot of sense to
+index the 'id' column. It's used very often to filter out rows. Also, it has a high
+degree of uniqueness(since it's the primary key) and you're going to be looking 
+for this value a lot(especially since 'Orders' table references it as a foreign key).
+
+I would apply the exact same logic by indexing 'id' in the 'Orders' table.
+
+5)
+select c.name, c.email, count(o.id) from Customers c inner join Orders o on c.id=o.customer_id
+
+6)
+select c.id, c.name from Customer c inner join Orders o on c.id=o.customer_id
+where count(c.id) between 2 and 5
+
